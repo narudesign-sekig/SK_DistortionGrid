@@ -3,9 +3,10 @@
 @script motion
 @name SK_DistortionGrid
 
+desc = "SK Distortion Grid";
+
 objId;
-positionX, positionY;
-desc;
+positionX, positionZ;
 
 create
 {
@@ -14,23 +15,49 @@ create
         objId[i] = nil;
     }
     positionX = 50.0;
-    positionY = 50.0;
-    desc = "SK Distortion Grid";
+    positionZ = 50.0;
     
     updateDesc();
 }
 
 updateDesc
 {
-    setdesc(desc + " X:" + positionX + "%, Y:" + positionY + "%");
+    setdesc(desc + " X:" + positionX + "%, Z:" + positionZ + "%");
 }
 
 process: ma, frame, time
 {
-    if (!objId[1] || !objId[2] || !objId[3] || !objId[4])
+    for (i = 1; i <= 4; i++)
     {
-        return;
+        if (!objId[i])
+            return;
     }
+    
+    for (i = 1; i <= 4; i++)
+    {
+        obj[i] = searchObject(objId[i]);
+        if (!obj[i])
+            return;
+    }
+    
+    pos1 = obj[1].getWorldPosition(time);
+    pos2 = obj[2].getWorldPosition(time);
+    x = pos1.x + (pos2.x - pos1.x) * positionZ / 100.0;
+    z = pos1.z + (pos2.z - pos1.z) * positionZ / 100.0;
+    posA = <x, 0, z>;
+    
+    pos1 = obj[3].getWorldPosition(time);
+    pos2 = obj[4].getWorldPosition(time);
+    x = pos1.x + (pos2.x - pos1.x) * positionZ / 100.0;
+    z = pos1.z + (pos2.z - pos1.z) * positionZ / 100.0;
+    posB = <x, 0, z>;
+
+    x = posA.x + (posB.x - posA.x) * positionX / 100.0;
+    z = posA.z + (posB.z - posA.z) * positionX / 100.0;
+    posC = <x, 0, z>;
+    
+    ma.set(POSITION, posC);
+    return;
     
     x = 0;
     obj1 = searchObject(objId[1]);
@@ -56,7 +83,7 @@ options
     c[3] = ctlallitems("Corner10", obj[3]);
     c[4] = ctlallitems("Corner11", obj[4]);
     cPositionX = ctlnumber("Position X (%)", positionX);
-    cPositionY = ctlnumber("Position Y (%)", positionY);
+    cPositionZ = ctlnumber("Position Z (%)", positionZ);
     
     return if !reqpost();
     
@@ -66,7 +93,7 @@ options
     }
     
     positionX = getvalue(cPositionX);
-    positionY = getvalue(cPositionY);
+    positionZ = getvalue(cPositionZ);
     
     updateDesc();
     
@@ -102,7 +129,7 @@ load: what, io
             objId[i] = io.read();
         }
         positionX = io.read().asNum();
-        positionY = io.read().asNum();
+        positionZ = io.read().asNum();
         
         updateDesc();
     }
@@ -117,6 +144,6 @@ save: what, io
             io.writeln(objId[i].asStr());
         }
         io.writeln(positionX);
-        io.writeln(positionY);
+        io.writeln(positionZ);
     }
 }
