@@ -4,20 +4,40 @@
 @name SK_DistortionGrid
 
 objId;
+positionX, positionY;
+desc;
 
 create
 {
-    setdesc("SK Distortion Grid");
+    for (i = 1; i <= 4; i++)
+    {
+        objId[i] = nil;
+    }
+    positionX = 50.0;
+    positionY = 50.0;
+    desc = "SK Distortion Grid";
+    
+    updateDesc();
+}
+
+updateDesc
+{
+    setdesc(desc + " X:" + positionX + "%, Y:" + positionY + "%");
 }
 
 process: ma, frame, time
 {
-    x = 0;
-    obj = searchObject(objId);
-    
-    if (obj)
+    if (!objId[1] || !objId[2] || !objId[3] || !objId[4])
     {
-        x = obj.getWorldPosition(time);
+        return;
+    }
+    
+    x = 0;
+    obj1 = searchObject(objId[1]);
+    
+    if (obj1)
+    {
+        x = obj1.getWorldPosition(time);
     }
     ma.set(POSITION, <x, 0, 0>);
 }
@@ -26,12 +46,35 @@ options
 {
     reqbegin("SK Distortion Grid");
     
-    obj = searchObject(objId);
+    for (i = 1; i <= 4; i++)
+    {
+        obj[i] = searchObject(objId[i]);
+    }
     
-    c1 = ctlallitems("Corner00", obj);
+    c[1] = ctlallitems("Corner00", obj[1]);
+    c[2] = ctlallitems("Corner01", obj[2]);
+    c[3] = ctlallitems("Corner10", obj[3]);
+    c[4] = ctlallitems("Corner11", obj[4]);
+    cPositionX = ctlnumber("Position X (%)", positionX);
+    cPositionY = ctlnumber("Position Y (%)", positionY);
+    
     return if !reqpost();
     
-    objId = getvalue(c1).id;
+    for (i = 1; i <= 4; i++)
+    {
+        obj[i] = getvalue(c[i]);
+    }
+    
+    positionX = getvalue(cPositionX);
+    positionY = getvalue(cPositionY);
+    
+    updateDesc();
+    
+    for (i = 1; i <= 4; i++)
+    {
+        objId[i] = nil;
+        if (obj[i]) objId[i] = getvalue(c[i]).id;
+    }
     
     reqend();
 }
@@ -54,7 +97,14 @@ load: what, io
 {
     if (what == SCENEMODE)
     {
-        objId = io.read();
+        for (i = 1; i <= 4; i++)
+        {
+            objId[i] = io.read();
+        }
+        positionX = io.read().asNum();
+        positionY = io.read().asNum();
+        
+        updateDesc();
     }
 }
 
@@ -62,6 +112,11 @@ save: what, io
 {
     if (what == SCENEMODE)
     {
-        io.writeln(objId.asStr());
+        for (i = 1; i <= 4; i++)
+        {
+            io.writeln(objId[i].asStr());
+        }
+        io.writeln(positionX);
+        io.writeln(positionY);
     }
 }
