@@ -25,6 +25,14 @@ updateDesc
     setdesc(desc + " X:" + positionX + "%, Z:" + positionZ + "%");
 }
 
+calculatePosition: pos1, pos2, pos
+{
+    x = pos1.x + (pos2.x - pos1.x) * pos / 100.0;
+    z = pos1.z + (pos2.z - pos1.z) * pos / 100.0;
+    
+    return <x, 0, z>;
+}
+
 process: ma, frame, time
 {
     for (i = 1; i <= 4; i++)
@@ -40,33 +48,13 @@ process: ma, frame, time
             return;
     }
     
-    pos1 = obj[1].getWorldPosition(time);
-    pos2 = obj[2].getWorldPosition(time);
-    x = pos1.x + (pos2.x - pos1.x) * positionZ / 100.0;
-    z = pos1.z + (pos2.z - pos1.z) * positionZ / 100.0;
-    posA = <x, 0, z>;
-    
-    pos1 = obj[3].getWorldPosition(time);
-    pos2 = obj[4].getWorldPosition(time);
-    x = pos1.x + (pos2.x - pos1.x) * positionZ / 100.0;
-    z = pos1.z + (pos2.z - pos1.z) * positionZ / 100.0;
-    posB = <x, 0, z>;
-
-    x = posA.x + (posB.x - posA.x) * positionX / 100.0;
-    z = posA.z + (posB.z - posA.z) * positionX / 100.0;
-    posC = <x, 0, z>;
+    posA = calculatePosition(obj[1].getWorldPosition(time), obj[2].getWorldPosition(time), positionZ);
+    posB = calculatePosition(obj[3].getWorldPosition(time), obj[4].getWorldPosition(time), positionZ);
+    posC = calculatePosition(posA, posB, positionX);
     
     ma.set(POSITION, posC);
+    
     return;
-    
-    x = 0;
-    obj1 = searchObject(objId[1]);
-    
-    if (obj1)
-    {
-        x = obj1.getWorldPosition(time);
-    }
-    ma.set(POSITION, <x, 0, 0>);
 }
 
 options
