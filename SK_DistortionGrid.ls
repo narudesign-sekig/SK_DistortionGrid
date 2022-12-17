@@ -49,8 +49,8 @@ process: ma, frame, time
             return;
     }
     
-    posA = calculatePosition(obj[1].getWorldPosition(time), obj[2].getWorldPosition(time), positionZ);
-    posB = calculatePosition(obj[3].getWorldPosition(time), obj[4].getWorldPosition(time), positionZ);
+    posA = calculatePosition(obj[1].getPosition(time), obj[2].getPosition(time), positionZ);
+    posB = calculatePosition(obj[3].getPosition(time), obj[4].getPosition(time), positionZ);
     posC = calculatePosition(posA, posB, positionX);
     
     ma.set(POSITION, posC);
