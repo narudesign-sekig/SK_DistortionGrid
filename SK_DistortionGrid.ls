@@ -28,9 +28,10 @@ updateDesc
 calculatePosition: pos1, pos2, pos
 {
     x = pos1.x + (pos2.x - pos1.x) * pos / 100.0;
+    y = pos1.y + (pos2.y - pos1.y) * pos / 100.0;
     z = pos1.z + (pos2.z - pos1.z) * pos / 100.0;
     
-    return <x, 0, z>;
+    return <x, y, z>;
 }
 
 process: ma, frame, time
